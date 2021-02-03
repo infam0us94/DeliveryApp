@@ -2,11 +2,16 @@ package com.project.deliveryapp;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 
 import com.google.gson.Gson;
+import com.project.deliveryapp.adapter.RestaurantListAdapter;
 import com.project.deliveryapp.model.RestaurantModel;
 
 import java.io.BufferedReader;
@@ -18,7 +23,7 @@ import java.io.Writer;
 import java.util.Arrays;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements RestaurantListAdapter.RestaurantListClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,11 +35,14 @@ public class MainActivity extends AppCompatActivity {
 
         List<RestaurantModel> restaurantModelList = getRestaurantData();
 
-        initRecView();
+        initRecView(restaurantModelList);
     }
 
-    private void initRecView() {
-
+    private void initRecView(List<RestaurantModel> restaurantModelList) {
+        RecyclerView recyclerView = findViewById(R.id.rec_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        RestaurantListAdapter adapter = new RestaurantListAdapter(restaurantModelList, this);
+        recyclerView.setAdapter(adapter);
     }
 
     private List<RestaurantModel> getRestaurantData() {
@@ -55,5 +63,12 @@ public class MainActivity extends AppCompatActivity {
         RestaurantModel[] restaurantModels = gson.fromJson(jsonSrt, RestaurantModel[].class);
         List<RestaurantModel> restList = Arrays.asList(restaurantModels);
         return restList;
+    }
+
+    @Override
+    public void onItemClick(RestaurantModel restaurantModel) {
+        Intent intent = new Intent(MainActivity.this, RestaurantMenuActivity.class);
+        intent.putExtra("RestaurantModel", restaurantModel);
+        startActivity(intent);
     }
 }
